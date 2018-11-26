@@ -1,5 +1,4 @@
 package object model {
-  type MaximumLevel = Map[String, String]
 
   case class TarifsData(ck1: Ck1,
                         ck1kp: Ck1,
@@ -13,6 +12,8 @@ package object model {
                         ck5kp: Ck5,
                         ck6: Ck6,
                         ck6kp: Ck6)
+
+  type MaximumLevel = Map[String, String]
 
   type RateE = Array[String]
 
@@ -33,4 +34,5 @@ package object model {
   case class MaximumLevel3Zone(night: MaximumLevel, peak: MaximumLevel, halfPeak: MaximumLevel)
 
   case class MaximumLevel2Zone(night: MaximumLevel, peak: MaximumLevel)
+
 }

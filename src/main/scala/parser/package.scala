@@ -1,5 +1,8 @@
 import model._
 
+//TODO: get by index, call head after drop and slice are unsafe.
+//Run time exception here means, that file has wrong format.
+//Add error handling
 package object Parser {
 
   val currentLevels = List("BH", "CHI", "CHII", "HH")

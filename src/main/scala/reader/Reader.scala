@@ -4,7 +4,9 @@ package reader
 import model._
 import scala.util.{Failure, Success, Try}
 
-
+//TODO: get by index, call head after drop and slice are unsafe.
+//Run time exception here means, that file has wrong format.
+//Add error handling
 object Reader {
 
   val ck1SheetIdx = 0
@@ -24,18 +26,18 @@ object Reader {
   def read(fileName: String): Try[TarifsData] = {
     try {
       val csvLines = XlsxToCsv.convert(fileName)
-      val ck1 = jsonExportCk1(readCk1(csvLines, ck1SheetIdx))
-      val ck1kp = jsonExportCk1(readCk1(csvLines, ck1kpSheetIdx))
-      val ck2 = jsonExportCk2(readCk2(csvLines, ck2SheetIdx))
-      val ck2kp = jsonExportCk2(readCk2(csvLines, ck2kpSheetIdx))
-      val ck3 = jsonExportCk3(readCk3(csvLines, ck3SheetIdx))
-      val ck3kp = jsonExportCk3(readCk3(csvLines, ck3kpSheetIdx))
-      val ck4 = jsonExportCk4(readCk3(csvLines, ck4SheetIdx))
-      val ck4kp = jsonExportCk4(readCk3(csvLines, ck4kpSheetIdx))
-      val ck5 = jsonExportCk5(readCk3(csvLines, ck5SheetIdx))
-      val ck5kp = jsonExportCk5(readCk3(csvLines, ck5kpSheetIdx))
-      val ck6 = jsonExportCk6(readCk3(csvLines, ck6SheetIdx))
-      val ck6kp = jsonExportCk6(readCk3(csvLines, ck6kpSheetIdx))
+      val ck1 = createCk1(readCk1(csvLines, ck1SheetIdx))
+      val ck1kp = createCk1(readCk1(csvLines, ck1kpSheetIdx))
+      val ck2 = createCk2(readCk2(csvLines, ck2SheetIdx))
+      val ck2kp = createCk2(readCk2(csvLines, ck2kpSheetIdx))
+      val ck3 = createCk3(readCk3(csvLines, ck3SheetIdx))
+      val ck3kp = createCk3(readCk3(csvLines, ck3kpSheetIdx))
+      val ck4 = createCk4(readCk3(csvLines, ck4SheetIdx))
+      val ck4kp = createCk4(readCk3(csvLines, ck4kpSheetIdx))
+      val ck5 = createCk5(readCk3(csvLines, ck5SheetIdx))
+      val ck5kp = createCk5(readCk3(csvLines, ck5kpSheetIdx))
+      val ck6 = createCk6(readCk3(csvLines, ck6SheetIdx))
+      val ck6kp = createCk6(readCk3(csvLines, ck6kpSheetIdx))
       Success(TarifsData(ck1, ck1kp, ck2, ck2kp, ck3, ck3kp, ck4, ck4kp, ck5, ck5kp, ck6, ck6kp))
     } catch {
       case e: Exception => Failure(e)
@@ -81,66 +83,66 @@ object Reader {
     }
   }
 
-  def jsonExportCk1(splitted: List[Iterable[Array[String]]]): Ck1 = {
+  def createCk1(splitted: List[Iterable[Array[String]]]): Ck1 = {
     Ck1(Parser.parseMaximumLevelUnregPrices(splitted).toMap)
   }
 
-  def jsonExportCk2(splitted: List[Iterable[Array[String]]]): Ck2 = {
+  def createCk2(splitted: List[Iterable[Array[String]]]): Ck2 = {
     val value3Zone = Parser.parseMaximumLevelUnregPrices3Zones(0, splitted)
     val value2Zone = Parser.parseMaximumLevelUnregPrices2Zones(1, splitted)
     Ck2(value3Zone, value2Zone)
   }
 
-  def jsonExportCk3(splitted: List[Iterable[Array[String]]]): Ck3 = {
-    val stavkaVN = Parser.parseRateE(0, splitted)
-    val stavkaCHI = Parser.parseRateE(1, splitted)
-    val stavkaCHII = Parser.parseRateE(2, splitted)
-    val stavkaHH = Parser.parseRateE(3, splitted)
-    val stavkaP = Parser.parseRateP(4, splitted)
+  def createCk3(splitted: List[Iterable[Array[String]]]): Ck3 = {
+    val rateVN = Parser.parseRateE(0, splitted)
+    val rateCHI = Parser.parseRateE(1, splitted)
+    val rateCHII = Parser.parseRateE(2, splitted)
+    val rateHH = Parser.parseRateE(3, splitted)
+    val rateP = Parser.parseRateP(4, splitted)
 
-    Ck3(stavkaVN, stavkaCHI, stavkaCHII, stavkaHH, stavkaP)
+    Ck3(rateVN, rateCHI, rateCHII, rateHH, rateP)
   }
 
-  def jsonExportCk4(splitted: List[Iterable[Array[String]]]): Ck4 = {
-    val stavkaVN = Parser.parseRateE(0, splitted)
-    val stavkaCHI = Parser.parseRateE(1, splitted)
-    val stavkaCHII = Parser.parseRateE(2, splitted)
-    val stavkaHH = Parser.parseRateE(3, splitted)
-    val stavkaP = Parser.parseRateP(4, splitted)
-    val stavkaTransport = Parser.parseRateTransport(5, splitted)
+  def createCk4(splitted: List[Iterable[Array[String]]]): Ck4 = {
+    val rateVN = Parser.parseRateE(0, splitted)
+    val rateCHI = Parser.parseRateE(1, splitted)
+    val rateCHII = Parser.parseRateE(2, splitted)
+    val rateHH = Parser.parseRateE(3, splitted)
+    val rateP = Parser.parseRateP(4, splitted)
+    val rateTransport = Parser.parseRateTransport(5, splitted)
 
-    Ck4(stavkaVN, stavkaCHI, stavkaCHII, stavkaHH, stavkaP, stavkaTransport)
+    Ck4(rateVN, rateCHI, rateCHII, rateHH, rateP, rateTransport)
   }
 
-  def jsonExportCk5(splitted: List[Iterable[Array[String]]]): Ck5 = {
-    val stavkaVN = Parser.parseRateE(0, splitted)
-    val stavkaCHI = Parser.parseRateE(1, splitted)
-    val stavkaCHII = Parser.parseRateE(2, splitted)
-    val stavkaHH = Parser.parseRateE(3, splitted)
-    val stavkaExcessFact = Parser.parseRateE(4, splitted)
-    val stavkaExcessPlan = Parser.parseRateE(5, splitted)
+  def createCk5(splitted: List[Iterable[Array[String]]]): Ck5 = {
+    val rateVN = Parser.parseRateE(0, splitted)
+    val rateCHI = Parser.parseRateE(1, splitted)
+    val rateCHII = Parser.parseRateE(2, splitted)
+    val rateHH = Parser.parseRateE(3, splitted)
+    val rateExcessFact = Parser.parseRateE(4, splitted)
+    val rateExcessPlan = Parser.parseRateE(5, splitted)
 
-    val stavkaPlan = Parser.parseRatePlan(splitted(6).slice(1, 2).head)
-    val stavkaAbs = Parser.parseRateAbs(splitted(6).slice(2, 3).head)
-    val stavkaP = Parser.parseRateP(7, splitted)
+    val ratePlan = Parser.parseRatePlan(splitted(6).slice(1, 2).head)
+    val rateAbs = Parser.parseRateAbs(splitted(6).slice(2, 3).head)
+    val rateP = Parser.parseRateP(7, splitted)
 
-    Ck5(stavkaVN, stavkaCHI, stavkaCHII, stavkaHH, stavkaExcessFact, stavkaExcessPlan, stavkaPlan, stavkaAbs, stavkaP)
+    Ck5(rateVN, rateCHI, rateCHII, rateHH, rateExcessFact, rateExcessPlan, ratePlan, rateAbs, rateP)
   }
 
-  def jsonExportCk6(splitted: List[Iterable[Array[String]]]): Ck6 = {
-    val stavkaVN = Parser.parseRateE(0, splitted)
-    val stavkaCHI = Parser.parseRateE(1, splitted)
-    val stavkaCHII = Parser.parseRateE(2, splitted)
-    val stavkaHH = Parser.parseRateE(3, splitted)
-    val stavkaExcessFact = Parser.parseRateE(4, splitted)
-    val stavkaExcessPlan = Parser.parseRateE(5, splitted)
+  def createCk6(splitted: List[Iterable[Array[String]]]): Ck6 = {
+    val rateVN = Parser.parseRateE(0, splitted)
+    val rateCHI = Parser.parseRateE(1, splitted)
+    val rateCHII = Parser.parseRateE(2, splitted)
+    val rateHH = Parser.parseRateE(3, splitted)
+    val rateExcessFact = Parser.parseRateE(4, splitted)
+    val rateExcessPlan = Parser.parseRateE(5, splitted)
 
-    val stavkaPlan = Parser.parseRatePlan(splitted(6).slice(1, 2).head)
-    val stavkaAbs = Parser.parseRateAbs(splitted(6).slice(2, 3).head)
-    val stavkaP = Parser.parseRateP(7, splitted)
-    val stavkaTransport = Parser.parseRateTransport(8, splitted)
+    val ratePlan = Parser.parseRatePlan(splitted(6).slice(1, 2).head)
+    val rateAbs = Parser.parseRateAbs(splitted(6).slice(2, 3).head)
+    val rateP = Parser.parseRateP(7, splitted)
+    val rateTransport = Parser.parseRateTransport(8, splitted)
 
-    Ck6(stavkaVN, stavkaCHI, stavkaCHII, stavkaHH, stavkaExcessFact, stavkaExcessPlan, stavkaPlan, stavkaAbs, stavkaP, stavkaTransport)
+    Ck6(rateVN, rateCHI, rateCHII, rateHH, rateExcessFact, rateExcessPlan, ratePlan, rateAbs, rateP, rateTransport)
   }
 
 }
